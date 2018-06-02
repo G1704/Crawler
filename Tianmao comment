@@ -1,0 +1,23 @@
+import requests
+import re
+
+urls = []
+for i in list(range(1, 10)):
+    urls.append('https://rate.tmall.com/list_detail_rate.htm?itemId=543292276839&spuId=715117135&sellerId=725677994&order=3&currentPage=%s'%i)
+
+# 构建字段容器
+ratedate = []
+ratecontent = []
+# 循环抓取数据
+for url in urls:
+    content = requests.get(url).text
+    # 借助正则表达式使用findall进行匹配
+    ratecontent.extend(re.findall(re.compile('"rateContent":"(.*?)","'), content))
+    ratedate.extend(re.findall('"rateDate":"(.*?)"',content))
+    print('ok')
+
+# 写入数据
+file = open('Comments.csv', 'w')
+for i in list(range(0,len(ratedate))):
+    file.write(','.join((ratedate[i],ratecontent[i])) + '\n')
+file.close()
