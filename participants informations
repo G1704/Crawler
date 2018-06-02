@@ -1,0 +1,327 @@
+# 幕后团队
+# -*-coding:utf-8-*-
+import request
+import requests
+import sys
+import io
+import os
+import re
+import urllib3
+import urllib
+from urllib import parse
+from urllib import request
+from selenium import webdriver
+from time import sleep
+from pyquery import PyQuery as pq
+
+for i in range(2013,2016):
+    print(i)
+    dir_name = str(i)
+    os.mkdir(dir_name)
+    print('成功创建文件夹！')
+    with open('%s.txt'%str(i)) as ff:
+        data = ff.read()
+        datas = data.split('`')
+        k = 2
+        try:
+            while(datas[k] != ""):
+                k += 3
+                url = 'http://search.mtime.com/search/?q=%s'%datas[k]
+                print(url)
+                try:
+                    with open('./%s/%s.txt' % (dir_name,datas[k]), 'wb') as f:
+
+                        browser = webdriver.Chrome()
+                        browser.get(url)
+                        sleep(2)
+                        content = browser.execute_script("return document.documentElement.outerHTML")
+                        url2 = re.findall('.*target="_blank" href="(.*?)"><img alt="%s'%datas[k], content)
+                        url2 = str(url2[0]) + 'fullcredits.html'
+                        print(url2)
+                        browser.close()
+                        browser2 = webdriver.Chrome()
+                        browser2.get(url2)
+                        content2 = browser2.execute_script("return document.documentElement.outerHTML")
+                        browser2.close()
+                        print('开始匹配信息')
+
+
+                        actor = re.findall('<div class="credits_l">(.*?)</dl>                </div>            </div>', content2)
+                        try:
+                            actor = re.findall('<h3><a href="(.*?)" target="_blank">(.*?)</a></h3>', actor[0])
+                            f.write(str("演员：").encode())
+                            ele1 = {}
+                            ele1 = dict()
+                            for a in actor:
+                                ele1[a[1]] = a[0]
+                            f.write(str(ele1).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        Director = re.findall(
+                            '<div class="credits_list">.*?<h4>导演 Director</h4>(.*?)</p>                            </div>                    </div>',
+                            content2)
+                        try:
+                            Director = re.findall('<a target="_blank" href="(.*?)">(.*?)</a>', Director[0])
+                            f.write(str("导演：").encode())
+                            ele2 = {}
+                            ele2 = dict()
+                            for a in Director:
+                                ele2[a[1]] = a[0]
+                            f.write(str(ele2).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        Writer = re.findall('<div class="credits_list">.* <h4>编剧 Writer</h4>(.*?)</div>', content2)
+                        try:
+                            Writer = re.findall('<a target="_blank" href="(.*?)">(.*?)</a>.*</p>', Writer[0])
+                            f.write(str("编剧：").encode())
+                            ele3 = {}
+                            ele3 = dict()
+                            for a in Writer:
+                                ele3[a[1]] = a[0]
+                            f.write(str(ele3).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        Produced = re.findall('<div class="credits_list">.*<h4>制作人 Produced by</h4>(.*?)</div>', content2)
+                        try:
+                            Produced = re.findall('<a target="_blank" href="(.*?)">(.*?)</a>(.*?)</p>', Produced[0])
+                            f.write(str("制作人：").encode())
+                            ele4 = {}
+                            ele4 = dict()
+                            for a in Produced:
+                                ele4[a[1]] = a[0]
+                            f.write(str(ele4).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        Cinema = re.findall('<div class="credits_list">.*<h4>摄影 Cinematography</h4>(.*?)</div>', content2)
+                        try:
+                            Cinema = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Cinema[0])
+                            f.write(str("摄影：").encode())
+                            ele5 = {}
+                            ele5 = dict()
+                            for a in Cinema:
+                                ele5[a[1]] = a[0]
+                            f.write(str(ele5).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        Edit = re.findall('<div class="credits_list">.*<h4>剪辑 Film Editing</h4>(.*?)</div>', content2)
+                        try:
+                            Edit = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Edit[0])
+                            f.write(str("剪辑：").encode())
+                            ele6 = {}
+                            ele6 = dict()
+                            for a in Edit:
+                                ele6[a[1]] = a[0]
+                            f.write(str(ele6).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        OMusic = re.findall('<div class="credits_list">.*<h4>原创音乐 Original Music</h4>(.*?)</div>', content2)
+                        try:
+                            OMusic = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', OMusic[0])
+                            f.write(str("原创音乐：").encode())
+                            ele7 = {}
+                            ele7 = dict()
+                            for a in OMusic:
+                                ele7[a[1]] = a[0]
+                            f.write(str(ele7).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        Design = re.findall('<div class="credits_list">.*<h4>艺术指导 Production Designer</h4>(.*?)</div>', content2)
+                        try:
+                            Design = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Design[0])
+                            f.write(str("艺术指导：").encode())
+                            ele8 = {}
+                            ele8 = dict()
+                            for a in Design:
+                                ele8[a[1]] = a[0]
+                            f.write(str(ele8).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        Art = re.findall('<div class="credits_list">.*<h4>美术设计 Art Direction by</h4>(.*?)</div>', content2)
+                        try:
+                            Art = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Art[0])
+                            f.write(str("美术设计：").encode())
+                            ele9 = {}
+                            ele9 = dict()
+                            for a in Art:
+                                ele9[a[1]] = a[0]
+                            f.write(str(ele9).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        Costume = re.findall('<div class="credits_list">.*<h4>服装设计 Costume Design by</h4>(.*?)</div>', content2)
+                        try:
+                            Costume = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Costume[0])
+                            f.write(str("服装设计：").encode())
+                            ele10 = {}
+                            ele10 = dict()
+                            for a in Costume:
+                                ele10[a[1]] = a[0]
+                            f.write(str(ele10).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+
+                        Visual = re.findall('<div class="credits_list">.*<h4>视觉特效 Visual Effects Supervisor</h4>(.*?)</div>', content2)
+                        try:
+                            Visual = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Visual[0])
+                            f.write(str("视觉特效：").encode())
+                            ele11 = {}
+                            ele11 = dict()
+                            for a in Visual:
+                                ele11[a[1]] = a[0]
+                            f.write(str(ele11).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+                        Action = re.findall('<div class="credits_list">.*<h4>动作指导 Choreographer</h4>(.*?)</div>', content2)
+                        try:
+                            Action = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Action[0])
+                            f.write(str("动作指导：").encode())
+                            ele12 = {}
+                            ele12 = dict()
+                            for a in Action:
+                                ele12[a[1]] = a[0]
+                            f.write(str(ele12).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+                        Casting = re.findall('<div class="credits_list">.*<h4>选角导演 Casting</h4>(.*?)</div>', content2)
+                        try:
+                            Casting = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Casting[0])
+                            f.write(str("选角导演：").encode())
+                            ele13 = {}
+                            ele13 = dict()
+                            for a in Casting:
+                                ele13[a[1]] = a[0]
+                            f.write(str(ele13).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+                        Decoration = re.findall('<div class="credits_list">.*<h4>布景师 Set Decoration by</h4>(.*?)</div>', content2)
+                        try:
+                            Decoration = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Decoration[0])
+                            f.write(str("布景师：").encode())
+                            ele14 = {}
+                            ele14 = dict()
+                            for a in Decoration:
+                                ele14[a[1]] = a[0]
+                            f.write(str(ele14).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+
+
+                        Makeup = re.findall('<div class="credits_list">.*<h4>化妆造型 Makeup Department</h4>(.*?)</div>',
+                                                content2)
+                        try:
+                            Makeup = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Makeup[0])
+                            f.write(str("化妆造型：").encode())
+                            ele15 = {}
+                            ele15 = dict()
+                            for a in Makeup:
+                                ele15[a[1]] = a[0]
+                            f.write(str(ele15).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+                        Sound = re.findall('<div class="credits_list">.*<h4>声音部门 Sound Department</h4>(.*?)</div>',
+                                            content2)
+                        try:
+                            Sound = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Sound[0])
+                            f.write(str("声音部门：").encode())
+                            ele16 = {}
+                            ele16 = dict()
+                            for a in Sound:
+                                ele16[a[1]] = a[0]
+                            f.write(str(ele16).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+                        Assistant = re.findall('<div class="credits_list">.*<h4>副导演/助理导演 Assistant Director</h4>(.*?)</div>',
+                                           content2)
+                        try:
+                            Assistant = re.findall(' <a target="_blank" href="(.*?)">(.*?)</a>', Assistant[0])
+                            f.write(str("副导演/助理导演：").encode())
+                            ele17 = {}
+                            ele17 = dict()
+                            for a in Assistant:
+                                ele17[a[1]] = a[0]
+                            f.write(str(ele17).encode())
+                            f.write('\n'.encode())
+                        except:
+                            pass
+
+                        f.close()
+
+                except IndexError as e:
+                    print("找不到该影片")
+                    browser.close()
+        except IndexError as e:
+            continue
+        ff.close()
+
+
+
+
+
+
+
