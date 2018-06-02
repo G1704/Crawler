@@ -1,0 +1,78 @@
+# -*-coding:utf-8-*-
+from selenium import webdriver
+from time import sleep
+import requests
+import request
+import sys
+import io
+import re
+import urllib3
+import urllib
+from urllib import parse
+from urllib import request
+from pyquery import PyQuery as pq
+for j in range(2013,2016):
+    items = []
+    num = 1
+    url3 = ''
+    for k in range(0,2):
+        url = 'http://58921.com/alltime/%s?page=%s'%(j,k)
+        print(url)
+        request = urllib.request.Request(url)
+        response = urllib.request.urlopen(request)
+        r = response.read()
+        # print(r)
+        num = int(re.findall('<span class="pager_number">(.*?)</span>',str(r))[0])
+        print(num)
+        doc = pq(r)
+        for i in range(1, 21):
+            result = doc('tr').eq(i)
+            x1 = re.findall('<tr class=".*"><td>(.*?)</td><td>(.*?)</td><td><a href=".*">(.*?)</a>.*<img src="(.*?)" alt',str(result))
+            if x1 == []:
+                break
+            # print(x1)
+            items += x1
+    for k in range(2,num // 20 + 1):
+        url2 = 'http://58921.com/alltime/%s?page=%s'%(j,k)
+        print(url2)
+        s = requests.Session()
+        s.headers = {
+            "User_Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/65.0.3325.181 Chrome/65.0.3325.181 Safari/537.36"
+        }
+        z4 = s.get(url2)
+        sel2 = re.findall('"form_token" value="(.*?)"/>', str(z4.content))
+        # print(sel2)
+        datas = {
+            'mail': '954872212@qq.com',
+            'pass': '123456',
+            'form_id': 'user_login_form',
+            'form_token': sel2,
+            'submit': '登录'
+        }
+        loginuel = url2
+        z5 = s.post(url=loginuel, data=datas)
+        z6 = s.get(loginuel)
+        # print(z6.url)
+        r = z6.content
+        # print(r)
+        doc = pq(r)
+        for i in range(1, 30):
+            result = doc('tr').eq(i)
+            # print(result)
+            x1 = re.findall(
+                '<tr class=".*"><td>(.*?)</td><td>(.*?)</td><td><a href=".*">(.*?)</a>.*<img src="(.*?)" alt',
+                str(result))
+            if x1 == []:
+                break
+            # print(x1)
+            items += x1
+    line = ""
+    for i in items:
+        line += '`'.join(i)
+        line += '\n'
+        print(i)
+    print(line)
+    file = open('%s.txt'%j,'w')
+    file.write(line)
+    print('写入完毕')
+    file.close()
